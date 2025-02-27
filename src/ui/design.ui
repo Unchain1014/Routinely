@@ -152,8 +152,17 @@
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <property name="spacing">
+       <number>0</number>
+      </property>
       <item>
-       <widget class="QCheckBox" name="checkBox">
+       <widget class="QCheckBox" name="notifyCheckBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
          <string>Notify</string>
         </property>
@@ -163,22 +172,15 @@
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="radioButton_3">
-        <property name="text">
-         <string>One TIme</string>
+       <widget class="QCheckBox" name="repeatCheckBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="radioButton_2">
         <property name="text">
          <string>Repeat Daily</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -258,11 +260,9 @@
     </property>
     <addaction name="actionNew"/>
     <addaction name="actionLoad_Routine"/>
-    <addaction name="actionRecent_Routines"/>
     <addaction name="separator"/>
     <addaction name="actionSave"/>
     <addaction name="actionSave_As"/>
-    <addaction name="actionSave_All"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>

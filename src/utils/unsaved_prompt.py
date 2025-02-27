@@ -5,7 +5,7 @@ from PyQt6 import uic
 class UnsavedChangesDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
-        ui_path = os.path.join(os.path.dirname(__file__), "unsaved_prompt_design.ui")
+        ui_path = os.path.join(os.path.dirname(__file__), "..", "ui", "unsaved_prompt_design.ui")
         uic.loadUi(ui_path, self)
 
         # Set standard buttons

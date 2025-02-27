@@ -1,12 +1,14 @@
 import sys
-from PyQt6.QtWidgets import QApplication, QMainWindow, QListWidgetItem, QWidget, QDialog
-from PyQt6 import uic  # Load UI files dynamically
+import os
+from PyQt6.QtWidgets import QApplication, QMainWindow, QListWidgetItem, QWidget, QDialog, QFileDialog
+from PyQt6 import uic
 from PyQt6.QtCore import Qt
-from ui.unsaved_prompt import UnsavedChangesDialog
+from utils.unsaved_prompt import UnsavedChangesDialog
+from utils.serialization import save_routine_to_file
 
 class TaskItem(QWidget):
     """Custom task widget."""
-    def __init__(self, time, text, parent_list, parent_window):
+    def __init__(self, time, text, notify, repeat, parent_list, parent_window):
         super().__init__()
 
         # Load the task item UI
@@ -14,6 +16,10 @@ class TaskItem(QWidget):
 
         self.parent_list = parent_list
         self.parent_window = parent_window
+
+        # Store notify and repeat states as attributes
+        self.notify = notify
+        self.repeat = repeat
 
         # Set checkbox text with time prefix
         self.checkBox.setText(f"{time} - {text}")
@@ -36,6 +42,9 @@ class ConverterWindow(QMainWindow):
         # Load the UI file
         uic.loadUi("src/ui/design.ui", self)
 
+        # Track last saved file path
+        self.current_file_path = None
+
         # Connect button click to add task method
         self.addTaskButton.clicked.connect(self.add_task)
 
@@ -45,8 +54,11 @@ class ConverterWindow(QMainWindow):
         # Connect Clear Routine button to remove all tasks
         self.clearRoutineButton.clicked.connect(self.clear_tasks)
 
-        # Connect Save Routine menubar action
+        # Connect Save menubar action
         self.actionSave.triggered.connect(self.save_routine)
+
+        # Connect Save As menubar action
+        self.actionSave_As.triggered.connect (self.save_routine_as)
 
         # Connect Load Routine menubar action
         self.actionLoad_Routine.triggered.connect(self.on_load_routine_triggered)
@@ -80,19 +92,50 @@ class ConverterWindow(QMainWindow):
         print("Load routine logic here.")
 
     def save_routine(self):
-        print("Save routine logic here.")
+        """Saves the current routine to the last saved file, or asks for a location if not set."""
+        if not self.current_file_path:
+            return self.save_routine_as()  # If no file is selected, use Save As
+
+        success = save_routine_to_file(self.current_file_path, self.taskList)
+        if success:
+            print(f"Routine saving complete")
+        else:
+            print("Save failed")
+
+    def save_routine_as(self):
+        """Saves the routine with a file dialog, starting in the 'routines/' subdirectory."""
+        
+        # Ensure the routines/ directory exists
+        default_dir = os.path.join(os.getcwd(), "routines")
+        os.makedirs(default_dir, exist_ok=True)  # Create if it doesn't exist
+
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, "Save Routine", default_dir, "JSON Files (*.json);;All Files (*)"
+        )
+
+        if file_path:
+            self.current_file_path = file_path  # Store the new file path
+            success = save_routine_to_file(file_path, self.taskList)
+            if success:
+                print(f"Routine saving complete")
+            else:
+                print("Save failed")
 
     def add_task(self):
         """Adds a new task to the task list."""
         task_text = self.newTextField.text().strip()
         selected_time = self.timeEdit.text()
 
+        # Retrieve notify and repeat states from input fields
+        notify = self.notifyCheckBox.isChecked()
+        repeat = self.repeatCheckBox.isChecked()
+
         if task_text:
             # Create a QListWidgetItem
             item = QListWidgetItem(self.taskList)
 
             # Create a custom TaskItem widget
-            task_widget = TaskItem(selected_time, task_text, self.taskList, self)
+            task_widget = TaskItem(selected_time, task_text, notify, repeat, self.taskList, self)
 
             # Add the TaskItem widget to task list
             self.taskList.setItemWidget(item, task_widget)
