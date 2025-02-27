@@ -1,13 +1,12 @@
 import sys
 import os
-from PyQt6.QtWidgets import QApplication, QMainWindow, QListWidgetItem, QWidget, QDialog, QFileDialog
+from PyQt6.QtWidgets import QApplication, QMainWindow, QListWidgetItem, QWidget, QDialog, QFileDialog, QFrame, QSizePolicy
 from PyQt6 import uic
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QSize
 from utils.unsaved_prompt import UnsavedChangesDialog
 from utils.serialization import save_routine_to_file
 
 class TaskItem(QWidget):
-    """Custom task widget."""
     def __init__(self, time, text, notify, repeat, parent_list, parent_window):
         super().__init__()
 
@@ -28,11 +27,16 @@ class TaskItem(QWidget):
         self.deleteButton.clicked.connect(self.delete_task)
 
     def delete_task(self):
-        """Remove task item from list."""
         for i in range(self.parent_list.count()):
             item = self.parent_list.item(i)
             if self.parent_list.itemWidget(item) is self:
                 self.parent_list.takeItem(i)
+
+                if i == 0 and self.parent_list.count() > 0: # Remove divider below this task if this task is first
+                    self.parent_list.takeItem(i)
+                elif i > 0: # Remove divider above this task
+                    self.parent_list.takeItem(i - 1)
+
                 break # Stop after removing the first match
 
 class ConverterWindow(QMainWindow):
@@ -92,9 +96,11 @@ class ConverterWindow(QMainWindow):
         print("Load routine logic here.")
 
     def save_routine(self):
-        """Saves the current routine to the last saved file, or asks for a location if not set."""
         if not self.current_file_path:
-            return self.save_routine_as()  # If no file is selected, use Save As
+            self.save_routine_as()
+            if not self.current_file_path: # If still none, user canceled
+                print("Save canceled")
+                return
 
         success = save_routine_to_file(self.current_file_path, self.taskList)
         if success:
@@ -102,9 +108,7 @@ class ConverterWindow(QMainWindow):
         else:
             print("Save failed")
 
-    def save_routine_as(self):
-        """Saves the routine with a file dialog, starting in the 'routines/' subdirectory."""
-        
+    def save_routine_as(self):        
         # Ensure the routines/ directory exists
         default_dir = os.path.join(os.getcwd(), "routines")
         os.makedirs(default_dir, exist_ok=True)  # Create if it doesn't exist
@@ -122,22 +126,29 @@ class ConverterWindow(QMainWindow):
                 print("Save failed")
 
     def add_task(self):
-        """Adds a new task to the task list."""
         task_text = self.newTextField.text().strip()
         selected_time = self.timeEdit.text()
-
-        # Retrieve notify and repeat states from input fields
         notify = self.notifyCheckBox.isChecked()
         repeat = self.repeatCheckBox.isChecked()
 
         if task_text:
-            # Create a QListWidgetItem
+            # Add a line separator (except for the last task)
+            if self.taskList.count() > 0:
+                line_item = QListWidgetItem(self.taskList)
+                line_frame = QFrame()
+                line_frame.setFrameShape(QFrame.Shape.HLine)
+                line_frame.setFrameShadow(QFrame.Shadow.Sunken)
+                line_frame.setStyleSheet("color: gray;")
+                line_frame.setFixedHeight(2)
+                line_frame.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+                self.taskList.setItemWidget(line_item, line_frame)
+                line_item.setSizeHint(QSize(0, 2))  # (width, height)
+                line_item.setFlags(Qt.ItemFlag.NoItemFlags)
+                self.taskList.updateGeometry()
+
+            # Create a QListWidgetItem for the task
             item = QListWidgetItem(self.taskList)
-
-            # Create a custom TaskItem widget
             task_widget = TaskItem(selected_time, task_text, notify, repeat, self.taskList, self)
-
-            # Add the TaskItem widget to task list
             self.taskList.setItemWidget(item, task_widget)
             item.setSizeHint(task_widget.sizeHint())
 
@@ -145,7 +156,6 @@ class ConverterWindow(QMainWindow):
             self.newTextField.clear()
 
     def clear_tasks(self):
-        """Removes all tasks from the task list."""
         if self.taskList:
             self.taskList.clear()
 
