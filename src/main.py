@@ -2,9 +2,9 @@ import sys
 import os
 from PyQt6.QtWidgets import QApplication, QMainWindow, QListWidgetItem, QWidget, QDialog, QFileDialog, QFrame, QSizePolicy
 from PyQt6 import uic
-from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtCore import Qt, QSize, QTimer
 from utils.unsaved_prompt import UnsavedChangesDialog
-from utils.serialization import save_routine_to_file
+from utils.serialization import save_routine_to_file, load_routine_from_file
 
 class TaskItem(QWidget):
     def __init__(self, time, text, notify, repeat, parent_list, parent_window):
@@ -90,10 +90,20 @@ class ConverterWindow(QMainWindow):
         elif result == QDialog.DialogCode.Rejected:
             self.load_routine()
         # If canceled, do nothing
+    
+    def load_routine(self): # Load routine is not to be called directly, or unsaved changes check will be missed
+        default_dir = os.path.join(os.getcwd(), "routines") # Open file dialog in the 'routines/' directory
+        file_path, _ = QFileDialog.getOpenFileName(
+            self, "Load Routine", default_dir, "JSON Files (*.json);;All Files (*)"
+        )
 
-    # Load routine is not to be called directly, or unsaved changes check will be missed
-    def load_routine(self):
-        print("Load routine logic here.")
+        if file_path:
+            success = load_routine_from_file(file_path, self.taskList, TaskItem)
+            if success:
+                self.current_file_path = file_path  # Track the loaded file
+                print(f"Loaded routine from {file_path}")
+            else:
+                print("Failed to load routine")
 
     def save_routine(self):
         if not self.current_file_path:
@@ -102,7 +112,7 @@ class ConverterWindow(QMainWindow):
                 print("Save canceled")
                 return
 
-        success = save_routine_to_file(self.current_file_path, self.taskList)
+        success = save_routine_to_file(self.current_file_path, self.taskList, TaskItem)
         if success:
             print(f"Routine saving complete")
         else:
@@ -117,9 +127,12 @@ class ConverterWindow(QMainWindow):
             self, "Save Routine", default_dir, "JSON Files (*.json);;All Files (*)"
         )
 
+        if file_path and not file_path.lower().endswith(".json"):
+            file_path += ".json"
+
         if file_path:
             self.current_file_path = file_path  # Store the new file path
-            success = save_routine_to_file(file_path, self.taskList)
+            success = save_routine_to_file(file_path, self.taskList, TaskItem)
             if success:
                 print(f"Routine saving complete")
             else:

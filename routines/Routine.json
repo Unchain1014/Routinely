@@ -1,0 +1,35 @@
+{
+    "routine_name": "Routine",
+    "tasks": [
+        {
+            "title": "Wake Up",
+            "time": "8:00AM",
+            "notify": true,
+            "repeat": true
+        },
+        {
+            "title": "Brush Teeth",
+            "time": "8:30AM",
+            "notify": true,
+            "repeat": true
+        },
+        {
+            "title": "Work Out",
+            "time": "9:00AM",
+            "notify": true,
+            "repeat": true
+        },
+        {
+            "title": "Study",
+            "time": "10:00AM",
+            "notify": true,
+            "repeat": true
+        },
+        {
+            "title": "Lunch",
+            "time": "12:00PM",
+            "notify": true,
+            "repeat": true
+        }
+    ]
+}
