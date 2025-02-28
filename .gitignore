@@ -1,4 +1,5 @@
 routines/
+tests/
 __pycache__/
 venv/
 *.pyc

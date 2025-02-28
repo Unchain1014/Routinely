@@ -1,6 +1,7 @@
 import os
 import json
-from PyQt6.QtWidgets import QListWidgetItem
+from PyQt6.QtWidgets import QListWidgetItem, QFrame, QSizePolicy
+from PyQt6.QtCore import Qt, QSize
 
 def save_routine_to_file(file_path, task_list, task_item_class):
     # Extract routine name from file name (remove extension)
@@ -59,20 +60,29 @@ def load_routine_from_file(file_path, task_list, task_item_class):
         # Clear the current task list before loading new tasks
         task_list.clear()
 
-        # Loop through tasks and add them to the list
-        for task in data.get("tasks", []):
+        for index, task in enumerate(data.get("tasks", [])):
             title = task.get("title", "Untitled Task")
-            time = task.get("time", "00:00").replace("\u202f", "").strip()  # Clean \u202f
+            time = task.get("time", "00:00").replace("\u202f", "").strip()
             notify = task.get("notify", False)
             repeat = task.get("repeat", False)
 
-            # Create a QListWidgetItem
-            item = QListWidgetItem(task_list)
+            # Add a divider before each task (except for the first one)
+            if index > 0:
+                line_item = QListWidgetItem(task_list)
+                line_frame = QFrame()
+                line_frame.setFrameShape(QFrame.Shape.HLine)
+                line_frame.setFrameShadow(QFrame.Shadow.Sunken)
+                line_frame.setStyleSheet("color: gray;")
+                line_frame.setFixedHeight(2)
+                line_frame.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+                task_list.setItemWidget(line_item, line_frame)
+                line_item.setSizeHint(QSize(0, 2))
+                line_item.setFlags(Qt.ItemFlag.NoItemFlags)
 
-            # Create a TaskItem (Assumes TaskItem constructor matches this)
+            # Create a QListWidgetItem for the task
+            item = QListWidgetItem(task_list)
             task_widget = task_item_class(time, title, notify, repeat, task_list, None)
 
-            # Set the item widget
             task_list.setItemWidget(item, task_widget)
             item.setSizeHint(task_widget.sizeHint())
 
