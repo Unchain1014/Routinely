@@ -62,6 +62,9 @@ class ConverterWindow(QMainWindow):
         # Connect Clear Routine button to remove all tasks
         self.clearRoutineButton.clicked.connect(self.clear_tasks)
 
+        # Connect New Routine menubar action
+        self.actionNew.triggered.connect(self.new_routine)
+
         # Connect Save menubar action
         self.actionSave.triggered.connect(self.save_routine)
 
@@ -73,6 +76,23 @@ class ConverterWindow(QMainWindow):
 
         # Connect Quit menubar action
         self.actionQuit.triggered.connect(self.quit_triggered)
+
+    def new_routine(self):
+        if self.has_unsaved_changes():
+            dialog = UnsavedChangesDialog(self)
+            result = dialog.exec()
+
+            if result == QDialog.DialogCode.Accepted:
+                self.save_routine()
+            elif result == QDialog.DialogCode.Rejected:
+                pass  # Continue with creating a new routine
+            else:
+                return  # User canceled, don't create a new routine
+
+        self.clear_tasks()
+        self.current_file_path = None
+        self.last_saved_state = {"tasks": []}
+        print("New routine created")
 
     # When load routine is triggered, call this method first
     def on_load_routine_triggered(self):
@@ -218,6 +238,7 @@ class ConverterWindow(QMainWindow):
     def clear_tasks(self):
         if self.taskList:
             self.taskList.clear()
+            print("All tasks cleared")
 
     def quit_triggered(self):
         QApplication.quit()

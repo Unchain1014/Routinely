@@ -276,7 +276,7 @@
     <addaction name="actionCopy_Task"/>
     <addaction name="actionPaste_Task"/>
     <addaction name="actionDuplicate_Task"/>
-    <addaction name="actionDelet_Task"/>
+    <addaction name="actionDelete_Task"/>
     <addaction name="separator"/>
     <addaction name="actionSend_to_Top"/>
     <addaction name="actionSend_to_Bottom"/>
@@ -411,7 +411,7 @@
     <string>Ctrl+Y</string>
    </property>
   </action>
-  <action name="actionDelet_Task">
+  <action name="actionDelete_Task">
    <property name="text">
     <string>Delete Task</string>
    </property>

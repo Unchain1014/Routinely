@@ -16,8 +16,8 @@ class UnsavedChangesDialog(QDialog):
         )
 
         # Rename buttons
-        self.unsavedButtonBox.button(QDialogButtonBox.StandardButton.Save).setText("Save and Load")
-        self.unsavedButtonBox.button(QDialogButtonBox.StandardButton.Discard).setText("Discard and Load")
+        self.unsavedButtonBox.button(QDialogButtonBox.StandardButton.Save).setText("Save")
+        self.unsavedButtonBox.button(QDialogButtonBox.StandardButton.Discard).setText("Discard")
         self.unsavedButtonBox.button(QDialogButtonBox.StandardButton.Cancel).setText("Cancel")
 
         # Preselect "Cancel"
