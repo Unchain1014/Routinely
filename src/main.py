@@ -104,14 +104,14 @@ class ConverterWindow(QMainWindow):
             self.load_routine()
         # If canceled, do nothing
     
-    def load_routine(self): # Load routine is not to be called directly, or unsaved changes check will be missed
-        default_dir = os.path.join(os.getcwd(), "routines") # Open file dialog in the 'routines/' directory
+    def load_routine(self):
+        default_dir = os.path.join(os.getcwd(), "routines")  # Open file dialog in the 'routines/' directory
         file_path, _ = QFileDialog.getOpenFileName(
             self, "Load Routine", default_dir, "JSON Files (*.json);;All Files (*)"
         )
 
         if file_path:
-            success = load_routine_from_file(file_path, self.taskList, TaskItem)
+            success = load_routine_from_file(file_path, self.taskList, TaskItem, self)
             if success:
                 self.current_file_path = file_path  # Track the loaded file
                 self.last_saved_state = self.get_routine_state()
@@ -165,7 +165,8 @@ class ConverterWindow(QMainWindow):
                     "title": title,
                     "time": time,
                     "notify": task_widget.notify,
-                    "repeat": task_widget.repeat
+                    "repeat": task_widget.repeat,
+                    "checkbox_state": task_widget.checkBox.isChecked()
                 })
 
         return {"tasks": tasks}

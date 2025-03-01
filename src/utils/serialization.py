@@ -25,8 +25,9 @@ def save_routine_to_file(file_path, task_list, task_item_class):
             task_data = {
                 "title": title,
                 "time": time,
-                "notify": task_widget.notify,  # Placeholder for future implementation
-                "repeat": task_widget.repeat,  # Placeholder for future implementation
+                "notify": task_widget.notify,
+                "repeat": task_widget.repeat,
+                "checkbox_state": task_widget.checkBox.isChecked()
             }
             tasks.append(task_data)
 
@@ -44,7 +45,7 @@ def save_routine_to_file(file_path, task_list, task_item_class):
         print(f"Error saving routine: {e}")
         return False
 
-def load_routine_from_file(file_path, task_list, task_item_class):
+def load_routine_from_file(file_path, task_list, task_item_class, parent_window=None):
     # Ensure the file exists before trying to open it
     if not os.path.isfile(file_path):
         print(f"Error: File not found - {file_path}")
@@ -65,6 +66,7 @@ def load_routine_from_file(file_path, task_list, task_item_class):
             time = task.get("time", "00:00").replace("\u202f", "").strip()
             notify = task.get("notify", False)
             repeat = task.get("repeat", False)
+            checkbox_state = task.get("checkbox_state", False)
 
             # Add a divider before each task (except for the first one)
             if index > 0:
@@ -81,7 +83,10 @@ def load_routine_from_file(file_path, task_list, task_item_class):
 
             # Create a QListWidgetItem for the task
             item = QListWidgetItem(task_list)
-            task_widget = task_item_class(time, title, notify, repeat, task_list, None)
+            task_widget = task_item_class(time, title, notify, repeat, task_list, parent_window)
+
+            # Set the checkbox state as per the saved value
+            task_widget.checkBox.setChecked(checkbox_state)
 
             task_list.setItemWidget(item, task_widget)
             item.setSizeHint(task_widget.sizeHint())
