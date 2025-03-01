@@ -75,7 +75,7 @@ class ConverterWindow(QMainWindow):
         self.actionLoad_Routine.triggered.connect(self.on_load_routine_triggered)
 
         # Connect Quit menubar action
-        self.actionQuit.triggered.connect(self.quit_triggered)
+        self.actionQuit.triggered.connect(self.close)
 
     def new_routine(self):
         if self.has_unsaved_changes():
@@ -240,8 +240,20 @@ class ConverterWindow(QMainWindow):
             self.taskList.clear()
             print("All tasks cleared")
 
-    def quit_triggered(self):
-        QApplication.quit()
+    def closeEvent(self, event):
+        if self.has_unsaved_changes():
+            dialog = UnsavedChangesDialog(self)
+            result = dialog.exec()
+
+            if result == QDialog.DialogCode.Accepted:
+                self.save_routine()
+                event.accept()
+            elif result == QDialog.DialogCode.Rejected:
+                event.accept()
+            else:
+                event.ignore()
+        else:
+            event.accept()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
