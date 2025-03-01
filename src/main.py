@@ -48,6 +48,7 @@ class ConverterWindow(QMainWindow):
 
         # Track last saved file path
         self.current_file_path = None
+        self.last_saved_state = {"tasks": []}  # Empty routine by default (used for)
 
         # Connect button click to add task method
         self.addTaskButton.clicked.connect(self.add_task)
@@ -72,13 +73,25 @@ class ConverterWindow(QMainWindow):
 
     # When load routine is triggered, call this method first
     def on_load_routine_triggered(self):
-        if self.has_unsaved_changes(): # NOT YET IMPLEMENTED
+        if self.has_unsaved_changes():
             self.handle_unsaved_changes()
         else:
             self.load_routine()
 
     def has_unsaved_changes(self):
-        return True # Replace with actual logic later
+        """Checks if the current routine differs from the last saved state."""
+        if self.current_file_path is None and not self.get_routine_state():
+            # If no file is loaded and the routine is empty, assume no unsaved changes
+            return False
+
+        current_state = self.get_routine_state()
+
+        # If a file is loaded, but no changes have been made yet, the routine is not marked as unsaved
+        if self.current_file_path and current_state == self.last_saved_state:
+            return False  # No unsaved changes if current state matches last saved state
+
+        # If current state differs from the last saved state, it means there are unsaved changes
+        return current_state != self.last_saved_state
 
     def handle_unsaved_changes(self):
         dialog = UnsavedChangesDialog(self)
@@ -101,6 +114,7 @@ class ConverterWindow(QMainWindow):
             success = load_routine_from_file(file_path, self.taskList, TaskItem)
             if success:
                 self.current_file_path = file_path  # Track the loaded file
+                self.last_saved_state = self.get_routine_state()
                 print(f"Loaded routine from {file_path}")
             else:
                 print("Failed to load routine")
@@ -114,6 +128,7 @@ class ConverterWindow(QMainWindow):
 
         success = save_routine_to_file(self.current_file_path, self.taskList, TaskItem)
         if success:
+            self.last_saved_state = self.get_routine_state() # Save the current state
             print(f"Routine saving complete")
         else:
             print("Save failed")
@@ -137,6 +152,23 @@ class ConverterWindow(QMainWindow):
                 print(f"Routine saving complete")
             else:
                 print("Save failed")
+
+    def get_routine_state(self):
+        tasks = []
+        for i in range(self.taskList.count()):
+            item = self.taskList.item(i)
+            task_widget = self.taskList.itemWidget(item)
+
+            if isinstance(task_widget, TaskItem):
+                time, title = task_widget.checkBox.text().split(" - ", 1)
+                tasks.append({
+                    "title": title,
+                    "time": time,
+                    "notify": task_widget.notify,
+                    "repeat": task_widget.repeat
+                })
+
+        return {"tasks": tasks}
 
     def add_task(self):
         task_text = self.newTextField.text().strip()
