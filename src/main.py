@@ -189,7 +189,8 @@ class ConverterWindow(QMainWindow):
                 "time": datetime.strptime(selected_time, "%I:%M %p").time(),
                 "title": task_text,
                 "notify": notify,
-                "repeat": repeat
+                "repeat": repeat,
+                "checkbox_state": False
             }
 
             # Get the current routine state
@@ -207,6 +208,7 @@ class ConverterWindow(QMainWindow):
             for task in tasks:
                 item = QListWidgetItem(self.taskList)
                 task_widget = TaskItem(task["time"].strftime("%I:%M %p"), task["title"], task["notify"], task["repeat"], self.taskList, self)
+                task_widget.checkBox.setChecked(task["checkbox_state"])
                 self.taskList.setItemWidget(item, task_widget)
                 item.setSizeHint(task_widget.sizeHint())
 
