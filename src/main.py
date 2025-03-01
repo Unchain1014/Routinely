@@ -1,5 +1,6 @@
 import sys
 import os
+from datetime import datetime
 from PyQt6.QtWidgets import QApplication, QMainWindow, QListWidgetItem, QWidget, QDialog, QFileDialog, QFrame, QSizePolicy
 from PyQt6 import uic
 from PyQt6.QtCore import Qt, QSize, QTimer
@@ -32,12 +33,14 @@ class TaskItem(QWidget):
             if self.parent_list.itemWidget(item) is self:
                 self.parent_list.takeItem(i)
 
-                if i == 0 and self.parent_list.count() > 0: # Remove divider below this task if this task is first
-                    self.parent_list.takeItem(i)
-                elif i > 0: # Remove divider above this task
-                    self.parent_list.takeItem(i - 1)
+                if i > 0:  # Only remove divider above this task if it's not the first task
+                    divider_item = self.parent_list.item(i - 1)
+                    divider_widget = self.parent_list.itemWidget(divider_item)
 
-                break # Stop after removing the first match
+                    if isinstance(divider_widget, QFrame):
+                        self.parent_list.takeItem(i - 1)  # Remove the divider above this task
+
+                break  # Stop after removing the first match
 
 class ConverterWindow(QMainWindow):
     def __init__(self):
@@ -63,11 +66,11 @@ class ConverterWindow(QMainWindow):
         self.actionSave.triggered.connect(self.save_routine)
 
         # Connect Save As menubar action
-        self.actionSave_As.triggered.connect (self.save_routine_as)
+        self.actionSave_As.triggered.connect(self.save_routine_as)
 
         # Connect Load Routine menubar action
         self.actionLoad_Routine.triggered.connect(self.on_load_routine_triggered)
-        
+
         # Connect Quit menubar action
         self.actionQuit.triggered.connect(self.quit_triggered)
 
@@ -103,7 +106,7 @@ class ConverterWindow(QMainWindow):
         elif result == QDialog.DialogCode.Rejected:
             self.load_routine()
         # If canceled, do nothing
-    
+
     def load_routine(self):
         default_dir = os.path.join(os.getcwd(), "routines")  # Open file dialog in the 'routines/' directory
         file_path, _ = QFileDialog.getOpenFileName(
@@ -122,13 +125,13 @@ class ConverterWindow(QMainWindow):
     def save_routine(self):
         if not self.current_file_path:
             self.save_routine_as()
-            if not self.current_file_path: # If still none, user canceled
+            if not self.current_file_path:  # If still None, user canceled
                 print("Save canceled")
                 return
 
         success = save_routine_to_file(self.current_file_path, self.taskList, TaskItem)
         if success:
-            self.last_saved_state = self.get_routine_state() # Save the current state
+            self.last_saved_state = self.get_routine_state()  # Save the current state
             print(f"Routine saving complete")
         else:
             print("Save failed")
@@ -160,15 +163,18 @@ class ConverterWindow(QMainWindow):
             task_widget = self.taskList.itemWidget(item)
 
             if isinstance(task_widget, TaskItem):
-                time, title = task_widget.checkBox.text().split(" - ", 1)
+                time_str, title = task_widget.checkBox.text().split(" - ", 1)
+                time_obj = datetime.strptime(time_str, "%I:%M %p").time()  # Convert time to datetime.time object
+
                 tasks.append({
+                    "time": time_obj,
                     "title": title,
-                    "time": time,
                     "notify": task_widget.notify,
                     "repeat": task_widget.repeat,
                     "checkbox_state": task_widget.checkBox.isChecked()
                 })
 
+        tasks.sort(key=lambda x: x["time"])  # Sort tasks by time in ascending order
         return {"tasks": tasks}
 
     def add_task(self):
@@ -178,25 +184,31 @@ class ConverterWindow(QMainWindow):
         repeat = self.repeatCheckBox.isChecked()
 
         if task_text:
-            # Add a line separator (except for the last task)
-            if self.taskList.count() > 0:
-                line_item = QListWidgetItem(self.taskList)
-                line_frame = QFrame()
-                line_frame.setFrameShape(QFrame.Shape.HLine)
-                line_frame.setFrameShadow(QFrame.Shadow.Sunken)
-                line_frame.setStyleSheet("color: gray;")
-                line_frame.setFixedHeight(2)
-                line_frame.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-                self.taskList.setItemWidget(line_item, line_frame)
-                line_item.setSizeHint(QSize(0, 2))  # (width, height)
-                line_item.setFlags(Qt.ItemFlag.NoItemFlags)
-                self.taskList.updateGeometry()
+            # Create a new dictionary with the task details and the time as a datetime.time object
+            new_task = {
+                "time": datetime.strptime(selected_time, "%I:%M %p").time(),
+                "title": task_text,
+                "notify": notify,
+                "repeat": repeat
+            }
 
-            # Create a QListWidgetItem for the task
-            item = QListWidgetItem(self.taskList)
-            task_widget = TaskItem(selected_time, task_text, notify, repeat, self.taskList, self)
-            self.taskList.setItemWidget(item, task_widget)
-            item.setSizeHint(task_widget.sizeHint())
+            # Get the current routine state
+            current_state = self.get_routine_state()
+
+            # Insert the new task at the correct position based on time
+            tasks = current_state["tasks"]
+            tasks.append(new_task)
+            tasks.sort(key=lambda x: x["time"])  # Sort tasks by time in ascending order
+
+            # Clear the task list
+            self.taskList.clear()
+
+            # Add the sorted tasks back to the task list
+            for task in tasks:
+                item = QListWidgetItem(self.taskList)
+                task_widget = TaskItem(task["time"].strftime("%I:%M %p"), task["title"], task["notify"], task["repeat"], self.taskList, self)
+                self.taskList.setItemWidget(item, task_widget)
+                item.setSizeHint(task_widget.sizeHint())
 
             # Clear input field
             self.newTextField.clear()

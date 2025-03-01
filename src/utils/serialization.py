@@ -68,19 +68,6 @@ def load_routine_from_file(file_path, task_list, task_item_class, parent_window=
             repeat = task.get("repeat", False)
             checkbox_state = task.get("checkbox_state", False)
 
-            # Add a divider before each task (except for the first one)
-            if index > 0:
-                line_item = QListWidgetItem(task_list)
-                line_frame = QFrame()
-                line_frame.setFrameShape(QFrame.Shape.HLine)
-                line_frame.setFrameShadow(QFrame.Shadow.Sunken)
-                line_frame.setStyleSheet("color: gray;")
-                line_frame.setFixedHeight(2)
-                line_frame.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-                task_list.setItemWidget(line_item, line_frame)
-                line_item.setSizeHint(QSize(0, 2))
-                line_item.setFlags(Qt.ItemFlag.NoItemFlags)
-
             # Create a QListWidgetItem for the task
             item = QListWidgetItem(task_list)
             task_widget = task_item_class(time, title, notify, repeat, task_list, parent_window)
