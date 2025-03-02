@@ -11,21 +11,12 @@ from utils.serialization import save_routine_to_file, load_routine_from_file
 class TaskItem(QWidget):
     def __init__(self, time, text, notify, repeat, parent_list, parent_window):
         super().__init__()
-
-        # Load the task item UI
         uic.loadUi("src/ui/task_item.ui", self)
-
         self.parent_list = parent_list
         self.parent_window = parent_window
-
-        # Store notify and repeat states as attributes
         self.notify = notify
         self.repeat = repeat
-
-        # Set checkbox text with time prefix
         self.checkBox.setText(f"{time} - {text}")
-
-        # Connect delete button to remove item
         self.deleteButton.clicked.connect(self.delete_task)
 
     def delete_task(self):
@@ -33,15 +24,7 @@ class TaskItem(QWidget):
             item = self.parent_list.item(i)
             if self.parent_list.itemWidget(item) is self:
                 self.parent_list.takeItem(i)
-
-                if i > 0:  # Only remove divider above this task if it's not the first task
-                    divider_item = self.parent_list.item(i - 1)
-                    divider_widget = self.parent_list.itemWidget(divider_item)
-
-                    if isinstance(divider_widget, QFrame):
-                        self.parent_list.takeItem(i - 1)  # Remove the divider above this task
-
-                break  # Stop after removing the first match
+                break
 
 class ConverterWindow(QMainWindow):
     def __init__(self):
