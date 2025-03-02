@@ -42,31 +42,15 @@ class ConverterWindow(QMainWindow):
         self.current_file_path = None
         self.last_saved_state = {"tasks": []}  # Empty routine by default (used for)
 
-        # Connect button click to add task method
+        # Connect actions/buttons
         self.addTaskButton.clicked.connect(self.add_task)
-
-        # Connect Enter key press in newTextField to add task
         self.newTextField.returnPressed.connect(self.add_task)
-
-        # Connect Clear Routine button to remove all tasks
         self.clearRoutineButton.clicked.connect(self.clear_tasks)
-
-        # Connect New Routine menubar action
         self.actionNew.triggered.connect(self.new_routine)
-
-        # Connect Save menubar action
         self.actionSave.triggered.connect(self.save_routine)
-
-        # Connect Save As menubar action
         self.actionSave_As.triggered.connect(self.save_routine_as)
-
-        # Connect Load Routine menubar action
         self.actionLoad_Routine.triggered.connect(self.on_load_routine_triggered)
-
-        # Connect Quit menubar action
         self.actionQuit.triggered.connect(self.close)
-
-        # Connect Test Notification action
         self.actionTest_Notification.triggered.connect(lambda: self.show_notification("Test Notification"))
 
         # Initialize timer
@@ -99,8 +83,7 @@ class ConverterWindow(QMainWindow):
                 QSystemTrayIcon.MessageIcon.Information,
                 999999  # Duration in milliseconds
             )
-        else:
-            # Fallback to QMessageBox if system tray is not available
+        else: # Fallback to QMessageBox if system tray is not available
             notification = QMessageBox(self)
             notification.setWindowTitle("Routinely | Task Reminder")
             notification.setText(f"{task_text}")
@@ -125,7 +108,6 @@ class ConverterWindow(QMainWindow):
         self.last_saved_state = {"tasks": []}
         print("New routine created")
 
-    # When load routine is triggered, call this method first
     def on_load_routine_triggered(self):
         if self.has_unsaved_changes():
             self.handle_unsaved_changes()
@@ -187,8 +169,7 @@ class ConverterWindow(QMainWindow):
             print("Save failed")
 
     def save_routine_as(self):        
-        # Ensure the routines/ directory exists
-        default_dir = os.path.join(os.getcwd(), "routines")
+        default_dir = os.path.join(os.getcwd(), "routines") # Ensure the routines/ directory exists
         os.makedirs(default_dir, exist_ok=True)  # Create if it doesn't exist
 
         file_path, _ = QFileDialog.getSaveFileName(
@@ -233,8 +214,7 @@ class ConverterWindow(QMainWindow):
         notify = self.notifyCheckBox.isChecked()
         repeat = self.repeatCheckBox.isChecked()
 
-        if task_text:
-            # Create a new dictionary with the task details and the time as a datetime.time object
+        if task_text: # Create a new dictionary with the task details and the time as a datetime.time object
             new_task = {
                 "time": datetime.strptime(selected_time, "%I:%M %p").time(),
                 "title": task_text,
@@ -243,16 +223,14 @@ class ConverterWindow(QMainWindow):
                 "checkbox_state": False
             }
 
-            # Get the current routine state
-            current_state = self.get_routine_state()
+            current_state = self.get_routine_state() # Get the current routine state
 
             # Insert the new task at the correct position based on time
             tasks = current_state["tasks"]
             tasks.append(new_task)
             tasks.sort(key=lambda x: x["time"])  # Sort tasks by time in ascending order
 
-            # Clear the task list
-            self.taskList.clear()
+            self.taskList.clear() # Clear the task list
 
             # Add the sorted tasks back to the task list
             for task in tasks:
@@ -262,14 +240,12 @@ class ConverterWindow(QMainWindow):
                 self.taskList.setItemWidget(item, task_widget)
                 item.setSizeHint(task_widget.sizeHint())
 
-            # Clear input field
-            self.newTextField.clear()
+            self.newTextField.clear() # Clear input field
 
     def clear_tasks(self):
         if self.taskList:
             self.taskList.clear()
-            print("All tasks cleared")
-
+            
     def closeEvent(self, event):
         if self.has_unsaved_changes():
             dialog = UnsavedChangesDialog(self)
