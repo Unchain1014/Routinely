@@ -9,9 +9,10 @@
 - Open-source and cross-platform compatibility using PyQt6
 
 ![screenshot.png](/images/screenshot.png)
+
 ![screenshot2.png](/images/screenshot2.png)
 
-**Routinely** is designed to look and feel like a workplace daily scheduler and can be used for this purpose.
+**Routinely** is designed to look and feel like a workplace daily scheduler and can be used for this purpose. When it is time to notify about a task, a dialog window will pop up and steal focus until user confirmation. A custom sound will play on loop until the notification dialog window is acknowledged (replace /sounds/notification.wav).
 
 ## Installation  
 ### Prerequisites  
