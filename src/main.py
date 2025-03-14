@@ -1,12 +1,14 @@
 import sys
 import os
 from datetime import datetime
-from PyQt6.QtWidgets import QApplication, QMainWindow, QMessageBox, QListWidgetItem, QWidget, QDialog, QFileDialog, QFrame, QSizePolicy, QSystemTrayIcon
+from PyQt6.QtWidgets import QApplication, QMainWindow, QMessageBox, QMenu, QListWidgetItem, QWidget, QDialog, QFileDialog, QFrame, QSizePolicy, QSystemTrayIcon
 from PyQt6 import uic
 from PyQt6.QtGui import QIcon
-from PyQt6.QtCore import Qt, QSize, QTimer, QDateTime
+from PyQt6.QtCore import Qt, QSize, QTime, QTimer, QDateTime
 from utils.unsaved_prompt import UnsavedChangesDialog
 from utils.serialization import save_routine_to_file, load_routine_from_file
+from utils.audio_manager import AudioManager
+from utils.notification import NotificationDialog
 
 class TaskItem(QWidget):
     def __init__(self, time, text, notify, repeat, parent_list, parent_window):
@@ -32,8 +34,11 @@ class ConverterWindow(QMainWindow):
 
         # Initialize system tray icon
         self.tray_icon = QSystemTrayIcon(self)
-        self.tray_icon.setIcon(QIcon("src/ui/icon.svg"))  # Replace with the path to your icon file
+        self.tray_icon.setIcon(QIcon("src/ui/icon.svg"))
         self.tray_icon.show()
+
+        # Initialize AudioManager
+        self.audio_manager = AudioManager()
 
         # Load the UI file
         uic.loadUi("src/ui/design.ui", self)
@@ -56,40 +61,41 @@ class ConverterWindow(QMainWindow):
         # Initialize timer
         self.notification_timer = QTimer(self)
         self.notification_timer.timeout.connect(self.check_notifications)
-        self.notification_timer.start(60_000) # Check every 60 seconds
+        self.notification_timer.start(1_000) # Check every second
 
     def check_notifications(self):
-        current_time = QTime.currentTime().toString("HH:mm")  # 24-hour format
+        current_time = QTime.currentTime()
+
+        # Only check when seconds == 0 to avoid redundant processing
+        if current_time.second() != 0:
+            return  
+
+        current_time_str = current_time.toString("HH:mm")  # 24-hour format
 
         for i in range(self.taskList.count()):
             item = self.taskList.item(i)
             task_widget = self.taskList.itemWidget(item)
 
             if isinstance(task_widget, TaskItem) and task_widget.notify:
-                task_time = task_widget.checkBox.text().split(" - ")[0]
+                task_time_12h = task_widget.checkBox.text().split(" - ")[0]  # "10:30 AM"
+                
+                # Convert 12-hour format to 24-hour format
+                task_time_obj = QTime.fromString(task_time_12h, "hh:mm AP")  # AM/PM format
+                task_time_24h = task_time_obj.toString("HH:mm")  # Convert to 24-hour format
 
-                if task_time == current_time:
+                if task_time_24h == current_time_str:
                     self.show_notification(task_widget.checkBox.text())
 
                     if not task_widget.repeat:
                         self.taskList.takeItem(i)  # Remove task if repeat=False
 
     def show_notification(self, task_text):
-        if QSystemTrayIcon.isSystemTrayAvailable():
-            self.tray_icon.show()
-            self.tray_icon.showMessage(
-                "Routinely | Task Reminder",
-                task_text,
-                QSystemTrayIcon.MessageIcon.Information,
-                999999  # Duration in milliseconds
-            )
-        else: # Fallback to QMessageBox if system tray is not available
-            notification = QMessageBox(self)
-            notification.setWindowTitle("Routinely | Task Reminder")
-            notification.setText(f"{task_text}")
-            notification.setIcon(QMessageBox.Icon.Information)
-            notification.setStandardButtons(QMessageBox.StandardButton.Ok)
-            notification.exec()
+        dialog = NotificationDialog(task_text, self)
+        dialog.exec()  # Blocks input until dismissed
+
+    def stop_sound_and_close(self):
+        self.audio_manager.stop_notification_sound()
+        self.accept()
 
     def new_routine(self):
         if self.has_unsaved_changes():
