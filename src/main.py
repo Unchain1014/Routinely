@@ -1,14 +1,48 @@
 import sys
 import os
+import webbrowser
 from datetime import datetime
-from PyQt6.QtWidgets import QApplication, QMainWindow, QMessageBox, QMenu, QListWidgetItem, QWidget, QDialog, QFileDialog, QFrame, QSizePolicy, QSystemTrayIcon
+from PyQt6.QtWidgets import QApplication, QMainWindow, QMessageBox, QMenu, QListWidgetItem, QWidget, QDialog, QTextBrowser, QVBoxLayout, QFileDialog, QFrame, QSizePolicy, QSystemTrayIcon
 from PyQt6 import uic
 from PyQt6.QtGui import QIcon
-from PyQt6.QtCore import Qt, QSize, QTime, QTimer, QDateTime
+from PyQt6.QtCore import Qt, QSize, QTime, QTimer, QDateTime, QUrl
 from utils.unsaved_prompt import UnsavedChangesDialog
 from utils.serialization import save_routine_to_file, load_routine_from_file
 from utils.audio_manager import AudioManager
 from utils.notification import NotificationDialog
+
+class DocumentationDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Documentation")
+        self.setFixedSize(600, 300)
+
+        layout = QVBoxLayout(self)
+
+        self.text_browser = QTextBrowser(self)
+        self.text_browser.setReadOnly(True)
+        self.text_browser.setOpenExternalLinks(False)  # Handle links manually
+        layout.addWidget(self.text_browser)
+
+        self.load_documentation()
+
+        # Connect the anchorClicked signal
+        self.text_browser.anchorClicked.connect(self.on_anchor_clicked)
+
+    def load_documentation(self):
+        try:
+            with open('DOCUMENTATION.md', 'r') as file:
+                documentation_text = file.read()
+                self.text_browser.setMarkdown(documentation_text)
+        except FileNotFoundError:
+            self.text_browser.setPlainText("Documentation not found.")
+
+    def on_anchor_clicked(self, url: QUrl):
+        link = url.toString()
+        print(f"Clicked hyperlink: {link}")
+        webbrowser.open(link)
+        # Prevent navigation by ignoring the event’s default behavior
+        self.text_browser.setSource(QUrl())  # Reset source to avoid navigation
 
 class TaskItem(QWidget):
     def __init__(self, time, text, notify, repeat, parent_list, parent_window):
@@ -65,11 +99,22 @@ class ConverterWindow(QMainWindow):
         self.actionLoad_Routine.triggered.connect(self.on_load_routine_triggered)
         self.actionQuit.triggered.connect(self.close)
         self.actionTest_Notification.triggered.connect(lambda: self.show_notification("Test Notification"))
+        self.actionDocumentation.triggered.connect(self.show_documentation)
+        self.actionAbout.triggered.connect(self.show_about)
 
         # Initialize timer
         self.notification_timer = QTimer(self)
         self.notification_timer.timeout.connect(self.check_notifications)
         self.notification_timer.start(1_000) # Check every second
+
+    def show_documentation(self):
+        doc_dialog = DocumentationDialog(self)
+        doc_dialog.exec()
+
+    def show_about(self):
+        # Open GitHub repository in web browser
+        repo_url = "https://github.com/Unchain1014/Routinely"
+        webbrowser.open(repo_url)
 
     def check_notifications(self):
         current_time = QTime.currentTime()

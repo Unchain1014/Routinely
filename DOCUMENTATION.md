@@ -1,73 +1,38 @@
-# Routinely Documentation
+## Creating a New Routine
 
-Routinely is a lightweight, open-source daily routine tracker designed for Linux and Windows. It provides an uncluttered interface with essential features for managing tasks and routines efficiently.
+- Click the "File" menu in the top-left corner of the application.
+- Select "New" from the dropdown menu.
+- A new routine will be created with an empty task list.
 
-## Features
+## Adding Tasks
 
-- **Task Management:** Add, delete, and manage tasks with ease.
-- **Multiple Routine Tabs:** Organize tasks into different routines.
-- **Offline Usage:** No internet connection or account required.
-- **Cross-Platform Compatibility:** Works on both Linux and Windows using PyQt6.
+- Click the "Add Task" button or press the "Enter" to begin task creation.
+- Enter the task details, including the time, title, notification options, and repeat settings.
 
-## Getting Started
+## Setting Reminders
 
-### Prerequisites
+- Select the task(s) you want to set reminders for.
+- Check the "Notify" checkbox for each selected task.
+- Customize the notification options, such as sound, vibration, or popup message.
 
-- Python 3 (latest version recommended)
-- PyQt6
-- Git
+## Repeating Tasks
 
-### Installation
+- Select the task(s) you want to repeat.
+- Check the "Repeat" checkbox for each selected task.
+- Choose the repeat frequency (daily, weekly, or monthly).
 
-1. **Clone the Repository:**
-   ```bash
-   git clone git@github.com:Unchain1014/Routinely.git
-   ```
+## Saving and Loading Routines
 
-2. **Navigate to the Project Directory:**
-   ```bash
-   cd Routinely
-   ```
+- Click the "File" menu in the top-left corner of the application.
+- Select "Save" to save the current routine.
+- Select "Save As" to save the current routine with a different file name.
+- Select "Load Routine" to load a previously saved routine.
 
-3. **Install Dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+## Clearing Tasks
+- Click the "-" button to the right of a task to remove it
+- Press DEL on your keyboard to delete the selected task
+- Click the "Clear Routine" button to remove all tasks from the current routine.
 
-4. **Run the Application:**
-   ```bash
-   python src/main.py
-   ```
+## Troubleshooting
 
-## Usage
-
-### Main Window
-
-- **Clear Routine:** Click the "Clear Routine" button to remove all tasks from the current routine.
-- **Save Routine:** Use the "Save" option in the menu to save the current routine to a file.
-- **Load Routine:** Use the "Load Routine" option in the menu to load a routine from a file.
-- **New Routine:** Use the "New Routine" option in the menu to start a new routine. If there are unsaved changes, you will be prompted to save them.
-- **Quit:** Use the "Quit" option in the menu to exit the application. You will be prompted to save any unsaved changes.
-
-### Task Management
-
-- **Add Task:** Enter the task description and select the time, notification, and repeat options. Click "Add Task" to add it to the list.
-- **Delete Task:** Click the delete button next to a task to remove it from the list.
-- **Task Order:** Tasks are automatically sorted by notification time.
-
-### Saving and Loading
-
-- **Save Routine:** Save the current list of tasks to a JSON file. You can choose to overwrite an existing file or create a new one.
-- **Load Routine:** Load tasks from a previously saved JSON file.
-
-## Contributing
-
-Contributions are welcome! Please follow the steps mentioned in the 'Contributing' section of the README file to contribute to the project.
-
-## License
-
-This project is licensed under the GPL-3.0. See the [LICENSE](LICENSE) file for details.
-
-## Contact
-
-For questions or suggestions, please open an issue on GitHub.
+- If you encounter any issues or bugs while using Routinely, please [create a new issue](https://github.com/Unchain1014/Routinely/issues) on GitHub.

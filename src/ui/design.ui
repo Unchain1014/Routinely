@@ -278,8 +278,6 @@
     <addaction name="actionDuplicate_Task"/>
     <addaction name="actionDelete_Task"/>
     <addaction name="separator"/>
-    <addaction name="actionSend_to_Top"/>
-    <addaction name="actionSend_to_Bottom"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -339,7 +337,7 @@
   </action>
   <action name="actionCopy_Task">
    <property name="text">
-    <string>Copy Task</string>
+    <string>Copy Task*</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+C</string>
@@ -347,7 +345,7 @@
   </action>
   <action name="actionPaste_Task">
    <property name="text">
-    <string>Paste Task</string>
+    <string>Paste Task*</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+V</string>
@@ -355,7 +353,7 @@
   </action>
   <action name="actionDuplicate_Task">
    <property name="text">
-    <string>Duplicate Task</string>
+    <string>Duplicate Task*</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+D</string>
@@ -400,7 +398,10 @@
   </action>
   <action name="actionDelete_Task">
    <property name="text">
-    <string>Delete Task</string>
+    <string>Delete Task*</string>
+   </property>
+   <property name="shortcut">
+    <string>Del</string>
    </property>
   </action>
   <action name="actionSend_to_Top">
@@ -438,7 +439,7 @@
   </action>
   <action name="actionSettings">
    <property name="text">
-    <string>Settings</string>
+    <string>Settings*</string>
    </property>
   </action>
   <action name="actionTest_Notification">
