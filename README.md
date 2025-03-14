@@ -6,7 +6,8 @@
 - Multiple routine tabs for better organization  
 - No internet connection or account required
 - Routines stored in human-readable JSON files  
-- Open-source and cross-platform compatibility using PyQt6
+- Open-source and cross-platform compatibility using PyQt6  
+- User interface theme follows OS light/dark preference and theme colors  
 
 It is designed to look and feel like a workplace daily scheduler and can be used for this purpose. When it is time to notify about a task, a dialog window will pop up and steal focus until user confirmation. A custom sound will play on loop until the notification dialog window is acknowledged (replace "/sounds/notification.wav" to change this sound).
 
