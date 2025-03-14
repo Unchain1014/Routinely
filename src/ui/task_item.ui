@@ -52,7 +52,7 @@
       <widget class="QCheckBox" name="checkBox">
        <property name="font">
         <font>
-         <family>System-ui</family>
+         <family>Source Code Pro</family>
         </font>
        </property>
        <property name="text">
