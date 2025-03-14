@@ -3,7 +3,7 @@
 ## Overview  
 **Routinely** is a lightweight, open-source daily routine tracker designed for **Linux** and **Windows**. It provides an uncluttered interface while offering essential features such as:  
 - Task management with title, notification time, and repeat options  
-- Multiple routine tabs for better organization  
+- Multiple routine tabs for better organization (future goal)  
 - No internet connection or account required
 - Routines stored in human-readable JSON files  
 - Open-source and cross-platform compatibility using PyQt6  
