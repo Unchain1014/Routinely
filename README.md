@@ -9,6 +9,7 @@
 - Open-source and cross-platform compatibility using PyQt6
 
 ![screenshot.png](/images/screenshot.png)
+![screenshot2.png](/images/screenshot2.png)
 
 **Routinely** is designed to look and feel like a workplace daily scheduler and can be used for this purpose.
 
