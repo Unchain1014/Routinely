@@ -19,7 +19,15 @@ class TaskItem(QWidget):
         self.notify = notify
         self.repeat = repeat
         self.checkBox.setText(f"{time} - {text}")
+        self.checkBox.clicked.connect(self.select_task)
         self.deleteButton.clicked.connect(self.delete_task)
+
+    def select_task(self):
+        for i in range(self.parent_list.count()):
+            item = self.parent_list.item(i)
+            if self.parent_list.itemWidget(item) is self:
+                item.setSelected(True)
+                break
 
     def delete_task(self):
         for i in range(self.parent_list.count()):
