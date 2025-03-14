@@ -8,7 +8,7 @@
 - Routines stored in human-readable JSON files  
 - Open-source and cross-platform compatibility using PyQt6
 
-![Routinely Screenshot] (images/screenshot.png)
+![Routinely Screenshot] (/images/screenshot.png?raw=true)
 
 **Routinely** is designed to look and feel like a workplace daily scheduler and can be used for this purpose.
 
